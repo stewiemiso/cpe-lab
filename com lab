@@ -1,9 +1,10 @@
 import datetime
 
-welcomeName = "Welcome to KENK E-Shoppe :)"
+#Greetings for Users
+welcomeName = "Good Day! Welcome to KENK E-Shoppe 😊"
 print(welcomeName)
 
-# Initialize dictionaries for items, inventory, users, and sales
+# Initialize dictionaries for items, inventory, users, & sales
 items = {}
 inventory = {}
 users = {"admin": {"password": "adminpass", "role": "Admin"}}  # Store users with roles
@@ -29,14 +30,14 @@ def register_user():
 # Function to login user
 def login():
     print("\n--- Login ---")
-    username = input("Enter username: ")
-    password = input("Enter password: ")
+    username = input("Enter Username: ")
+    password = input("Enter Password: ")
 
     if username in users and users[username]["password"] == password:
-        print(f"Login successful! Welcome, {username}.")
+        print(f"Login successful! Welcome to KENK E-Shoppe, {username}.")
         return users[username]["role"]
     else:
-        print("Invalid credentials.")
+        print("Invalid Credentials.")
         return None
 
 # Add or edit product in the inventory
@@ -46,15 +47,15 @@ def add_or_edit_product():
         items[product_name] = {}
         inventory[product_name] = {}
 
-    size = input("Enter size (S, M, L): ").upper()
-    price = float(input("Enter price: "))
-    quantity = int(input("Enter quantity: "))
+    size = input("Enter Size (S, M, L): ").upper()
+    price = float(input("Enter Price: "))
+    quantity = int(input("Enter Quantity: "))
 
     items[product_name][size] = price
     inventory[product_name][size] = quantity
     print(f"Product '{product_name}' with size '{size}' has been added/updated.\n")
 
-# Manage users (register & delete)
+# Manage users to (register & delete)
 def manage_users():
     print("\n--- User Management ---")
     print("[1] Register New User")
@@ -73,7 +74,7 @@ def manage_users():
     else:
         print("Invalid option.\n")
 
-# Generate report for inventory, sales, and profit
+# Generate report for (inventory, sales, & profit)
 def generate_report():
     print("\n--- Inventory Report ---")
     for product, sizes in inventory.items():
@@ -92,7 +93,7 @@ def generate_report():
     print(f"Total Profit: ₱{total_profit:.2f}")
     print("------------------------\n")
 
-# Process a transaction and update inventory
+# Process a transaction & update inventory
 def process_transaction():
     total_cost = 0
     items_bought = []
@@ -121,13 +122,13 @@ def process_transaction():
             print("Insufficient stock. Try again.")
             continue
 
-        # Calculate cost and update inventory
+        # Calculate cost & update inventory
         price = items[product_name][size] * quantity
         total_cost += price
         items_bought.append((product_name, size, quantity, price))
         inventory[product_name][size] -= quantity
 
-    # Record sale and generate receipt
+    # Record sale & generate receipt
     if total_cost > 0:
         sales.append({"items": items_bought, "total_cost": total_cost})
         issue_receipt(items_bought, total_cost)
@@ -258,10 +259,11 @@ def main():
         elif choice == "2":
             register_user()
         elif choice == "3":
-            print("Exiting program.")
+            print("Visit Us Again 😊Thank you! for using KENK E-Shoppe.3")
             break
         else:
             print("Invalid option. Try again.")
+
 
 if __name__ == "__main__":
     main()
