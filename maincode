@@ -1,38 +1,87 @@
 import datetime
 
-#Greetings for Users
+# Greetings for Users
 welcomeName = "Good Day! Welcome to KENK E-Shoppe 😊"
 print(welcomeName)
+
+# File path for data
+DATA_FILE = 'product.txt'
 
 # Initialize dictionaries for items, inventory, users, & sales
 items = {}
 inventory = {}
-users = {"admin": {"password": "adminpass", "role": "Admin"}}  # Store users with roles
+users = {"admin": {"password": "adminpass", "role": "Admin"}}
 sales = []
 
-# Function to register new users
+# Load data from the file
+def load_data():
+    global users, inventory, sales
+    try:
+        with open(DATA_FILE, 'r') as f:
+            for line in f:
+                if line.startswith("USER:"):
+                    _, username, password, role = line.strip().split(", ")
+                    users[username] = {"password": password, "role": role}
+                elif line.startswith("ITEM:"):
+                    _, product, size, price, quantity = line.strip().split(", ")
+                    if product not in items:
+                        items[product] = {}
+                        inventory[product] = {}
+                    items[product][size] = float(price)
+                    inventory[product][size] = int(quantity)
+                elif line.startswith("SALE:"):
+                    _, product, size, qty, total_cost = line.strip().split(", ")
+                    sales.append({
+                        "product": product,
+                        "size": size,
+                        "quantity": int(qty),
+                        "total_cost": float(total_cost)
+                    })
+    except FileNotFoundError:
+        print(f"'{DATA_FILE}' not found. Starting with an empty inventory.")
+
+# Save data to the file
+def save_data():
+    with open(DATA_FILE, 'w') as f:
+        for username, data in users.items():
+            f.write(f"USER: {username}, {data['password']}, {data['role']}\n")
+        for product, sizes in items.items():
+            for size, price in sizes.items():
+                quantity = inventory[product][size]
+                f.write(f"ITEM: {product}, {size}, {price}, {quantity}\n")
+        for sale in sales:
+            f.write(f"SALE: {sale['product']}, {sale['size']}, {sale['quantity']}, {sale['total_cost']}\n")
+
+# Register new user
 def register_user():
     print("\n--- Register New User ---")
     username = input("Enter new username: ")
     if username in users:
         print("Username already exists. Try another username.")
         return
-
     password = input("Enter password: ")
     role = input("Enter role (Admin/Cashier/Buyer): ").capitalize()
-
     if role in ["Admin", "Cashier", "Buyer"]:
         users[username] = {"password": password, "role": role}
         print(f"User '{username}' registered successfully as {role}.\n")
     else:
         print("Invalid role. User registration failed.\n")
 
-# Function to login user
+# Delete user
+def delete_user():
+    print("\n--- Delete Existing User ---")
+    username = input("Enter username to delete: ")
+    if username in users:
+        del users[username]
+        print(f"User '{username}' deleted successfully.\n")
+    else:
+        print("User not found.\n")
+
+# Login user
 def login():
     print("\n--- Login ---")
     username = input("Enter Username: ")
     password = input("Enter Password: ")
-
     if username in users and users[username]["password"] == password:
         print(f"Login successful! Welcome to KENK E-Shoppe, {username}.")
         return users[username]["role"]
@@ -43,99 +92,70 @@ def login():
 # Add or edit product in the inventory
 def add_or_edit_product():
     product_name = input("Enter the product name: ").capitalize()
-    if product_name not in items:
-        items[product_name] = {}
-        inventory[product_name] = {}
-
     size = input("Enter Size (S, M, L): ").upper()
     price = float(input("Enter Price: "))
     quantity = int(input("Enter Quantity: "))
-
+    if product_name not in items:
+        items[product_name] = {}
+        inventory[product_name] = {}
     items[product_name][size] = price
     inventory[product_name][size] = quantity
     print(f"Product '{product_name}' with size '{size}' has been added/updated.\n")
 
-# Manage users to (register & delete)
-def manage_users():
-    print("\n--- User Management ---")
-    print("[1] Register New User")
-    print("[2] Delete Existing User")
-    choice = input("Choose an option: ")
-
-    if choice == "1":
-        register_user()
-    elif choice == "2":
-        username = input("Enter username to delete: ")
-        if username in users:
-            del users[username]
-            print(f"User '{username}' deleted successfully.\n")
-        else:
-            print("User not found.\n")
-    else:
-        print("Invalid option.\n")
-
-# Generate report for (inventory, sales, & profit)
+# Generate report and save it to product.txt
 def generate_report():
     print("\n--- Inventory Report ---")
-    for product, sizes in inventory.items():
-        print(f"{product}:")
-        for size, quantity in sizes.items():
-            print(f"  Size {size}: {quantity} units")
+    with open(DATA_FILE, 'a') as f:  # Append report to the file
+        f.write("\n--- Inventory Report ---\n")
+        for product, sizes in inventory.items():
+            print(f"{product}:")
+            f.write(f"{product}:\n")
+            for size, quantity in sizes.items():
+                print(f"  Size {size}: {quantity} units")
+                f.write(f"  Size {size}: {quantity} units\n")
 
-    print("\n--- Sales Report ---")
-    total_sales = 0
-    total_profit = 0
-    for sale in sales:
-        total_sales += sale["total_cost"]
-        total_profit += sale["total_cost"] * 0.2  # Assuming a 20% profit margin
+        print("\n--- Sales Report ---")
+        f.write("\n--- Sales Report ---\n")
+        total_sales = 0
+        total_profit = 0
+        for sale in sales:
+            total_sales += sale["total_cost"]
+            total_profit += sale["total_cost"] * 0.2  # Assuming a 20% profit margin
 
-    print(f"Total Sales: ₱{total_sales:.2f}")
-    print(f"Total Profit: ₱{total_profit:.2f}")
-    print("------------------------\n")
+        print(f"Total Sales: ₱{total_sales:.2f}")
+        print(f"Total Profit: ₱{total_profit:.2f}")
+        print("------------------------\n")
+        f.write(f"Total Sales: ₱{total_sales:.2f}\n")
+        f.write(f"Total Profit: ₱{total_profit:.2f}\n")
+        f.write("------------------------\n")
 
 # Process a transaction & update inventory
 def process_transaction():
     total_cost = 0
     items_bought = []
-
     print("\nAvailable Items and Prices (in pesos):")
     for item, sizes in items.items():
         print(f"{item}:")
         for size, price in sizes.items():
             print(f"  Size {size}: ₱{price} (Stock: {inventory[item][size]})")
-
     while True:
         product_name = input("Enter product name (or 'done' to finish): ").capitalize()
         if product_name.lower() == 'done':
             break
-        if product_name not in items:
-            print("Invalid product name. Try again.")
-            continue
-
         size = input(f"Enter size for {product_name} (S, M, L): ").upper()
-        if size not in items[product_name]:
-            print("Invalid size. Try again.")
-            continue
-
         quantity = int(input(f"Enter quantity for {product_name} size {size}: "))
-        if quantity > inventory[product_name][size]:
-            print("Insufficient stock. Try again.")
-            continue
-
-        # Calculate cost & update inventory
-        price = items[product_name][size] * quantity
-        total_cost += price
-        items_bought.append((product_name, size, quantity, price))
-        inventory[product_name][size] -= quantity
-
-    # Record sale & generate receipt
+        if product_name in items and size in items[product_name] and quantity <= inventory[product_name][size]:
+            price = items[product_name][size] * quantity
+            total_cost += price
+            items_bought.append((product_name, size, quantity, price))
+            inventory[product_name][size] -= quantity
+            sales.append({"product": product_name, "size": size, "quantity": quantity, "total_cost": price})
+        else:
+            print("Invalid product or insufficient stock.")
     if total_cost > 0:
-        sales.append({"items": items_bought, "total_cost": total_cost})
         issue_receipt(items_bought, total_cost)
-    else:
-        print("No items purchased.")
 
-# Issue receipt for a transaction
+# Issue receipt
 def issue_receipt(items_bought, total_cost):
     print("\n--- Receipt ---")
     for item in items_bought:
@@ -144,126 +164,59 @@ def issue_receipt(items_bought, total_cost):
     print("Date:", datetime.datetime.now())
     print("----------------")
 
-# Display available items for buyers
-def view_items():
-    print("\nAvailable Items and Prices (in pesos):")
-    for item, sizes in items.items():
-        print(f"{item}:")
-        for size, price in sizes.items():
-            print(f"  Size {size}: ₱{price} (Stock: {inventory[item][size]})")
-
-
-# Function for buyers to purchase items
-def buyer_purchase():
-    view_items()
-    total_cost = 0
-    items_bought = []
-
-    while True:
-        product_name = input("Enter the item name (or 'done' to finish): ").capitalize()
-        if product_name.lower() == 'done':
-            break
-        if product_name not in items:
-            print("Invalid item name. Please try again.")
-            continue
-
-        size = input(f"Enter size for {product_name} (S, M, L): ").upper()
-        if size not in items[product_name]:
-            print("Invalid size. Please try again.")
-            continue
-
-        quantity = int(input(f"How many {product_name} in size {size} would you like to buy? "))
-        if quantity > inventory[product_name][size]:
-            print("Insufficient stock. Try again.")
-            continue
-
-        price = items[product_name][size] * quantity
-        total_cost += price
-        items_bought.append((product_name, size, quantity, price))
-        inventory[product_name][size] -= quantity
-
-    if total_cost > 0:
-        sales.append({"items": items_bought, "total_cost": total_cost})
-        issue_receipt(items_bought, total_cost)
-    else:
-        print("No items were purchased.")
-
 # Main function
 def main():
+    load_data()
     while True:
         print("\n--- Main Menu ---")
         print("[1] Login")
         print("[2] Register New User")
         print("[3] Exit")
-
         choice = input("Choose an option: ")
-
         if choice == "1":
             role = login()
             if not role:
                 continue
-
-            # Role-specific menus
-            while True:
-                if role == "Admin":
+            if role == "Admin":
+                while True:
                     print("\nAdmin Menu:")
                     print("[1] Add/Edit Product")
                     print("[2] User Management")
                     print("[3] Generate Report")
                     print("[4] Logout")
                     option = input("Select an option: ")
-
                     if option == "1":
                         add_or_edit_product()
                     elif option == "2":
-                        manage_users()
+                        print("[1] Register New User")
+                        print("[2] Delete Existing User")
+                        sub_option = input("Choose an option: ")
+                        if sub_option == "1":
+                            register_user()
+                        elif sub_option == "2":
+                            delete_user()
+                        else:
+                            print("Invalid option.")
                     elif option == "3":
                         generate_report()
                     elif option == "4":
                         print("Logging out.")
                         break
                     else:
-                        print("Invalid option. Try again.")
-
-                elif role == "Cashier":
-                    print("\nCashier Menu:")
-                    print("[1] Process Transaction")
-                    print("[2] Logout")
-                    option = input("Select an option: ")
-
-                    if option == "1":
-                        process_transaction()
-                    elif option == "2":
-                        print("Logging out.")
-                        break
-                    else:
-                        print("Invalid option. Try again.")
-
-                elif role == "Buyer":
-                    print("\nBuyer Menu:")
-                    print("[1] View Available Items")
-                    print("[2] Buy Items")
-                    print("[3] Logout")
-                    option = input("Select an option: ")
-
-                    if option == "1":
-                        view_items()
-                    elif option == "2":
-                        buyer_purchase()
-                    elif option == "3":
-                        print("Logging out.")
-                        break
-                    else:
-                        print("Invalid option. Try again.")
-
+                        print("Invalid option.")
+            elif role == "Cashier":
+                process_transaction()
+            elif role == "Buyer":
+                process_transaction()
+            save_data()  # Save data after actions
         elif choice == "2":
             register_user()
+            save_data()
         elif choice == "3":
-            print("Visit Us Again 😊Thank you! for using KENK E-Shoppe.3")
+            print("Thank you for using KENK E-Shoppe.")
             break
         else:
-            print("Invalid option. Try again.")
-
+            print("Invalid option.")
 
 if __name__ == "__main__":
     main()
