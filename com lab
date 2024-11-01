@@ -1,5 +1,8 @@
 import datetime
 
+welcomeName = "Welcome to KENK E-Shoppe :)"
+print(welcomeName)
+
 # Initialize dictionaries for items, inventory, users, and sales
 items = {}
 inventory = {}
