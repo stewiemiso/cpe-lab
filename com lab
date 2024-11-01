@@ -54,7 +54,7 @@ def add_or_edit_product():
     inventory[product_name][size] = quantity
     print(f"Product '{product_name}' with size '{size}' has been added/updated.\n")
 
-# Manage users (register, delete)
+# Manage users (register & delete)
 def manage_users():
     print("\n--- User Management ---")
     print("[1] Register New User")
