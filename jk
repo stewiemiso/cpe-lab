@@ -4,12 +4,11 @@ def factorial(n):
         return 1, "1"  # Return 1 and the calculation step as "1"
     
     result = 1
-    calculation_steps = []  # List to hold the steps for display
+    calculation_steps = []  
     for i in range(2, n + 1):
         result *= i
-        calculation_steps.append(str(i))  # Append each step to the list
+        calculation_steps.append(str(i))  
     
-    # Join the steps with " x " for display
     return result, " x ".join(calculation_steps)
 
 def main():
