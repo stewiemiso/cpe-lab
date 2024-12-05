@@ -13,11 +13,11 @@ def factorial(n):
     return result, " x ".join(calculation_steps)
 
 def main():
-    for _ in range(3):  
+    while True:  # Continue indefinitely until a negative number is entered
         try:
-            user_input = int(input("Please enter a positive integer: "))
+            user_input = int(input("Please enter a positive integer (or a negative number to exit): "))
             if user_input < 0:
-                print("Error: The number entered is negative. Please enter a positive integer.")
+                print("Exiting the program. Thank you!")
                 break 
             else:
                 fact, steps = factorial(user_input)  
