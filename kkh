@@ -1,133 +1,49 @@
-```python
-import sys
-versionNumber = sys.version_info.major
-if versionNumber == 3:
-    import tkinter
-    import tkinter.simpledialog
-    Tkinter = tkinter
-    tkSimpleDialog = tkinter.simpledialog
-else:
-    import Tkinter
-    import tkSimpleDialog
-
-N = Tkinter.N
-S = Tkinter.S
-E = Tkinter.E
-W = Tkinter.W
-CENTER = Tkinter.CENTER
-END = Tkinter.END
-NORMAL = Tkinter.NORMAL
-DISABLED = Tkinter.DISABLED
-NONE = Tkinter.NONE
-WORD = Tkinter.WORD
-VERTICAL = Tkinter.VERTICAL
-HORIZONTAL = Tkinter.HORIZONTAL
-RAISED = Tkinter.RAISED
-SINGLE = Tkinter.SINGLE
-ACTIVE = Tkinter.ACTIVE
-
-class EasyFrame(Tkinter.Frame):
-    """Represents an application window."""
-
-    def __init__(self, title = "", width = None, height = None,
-                 background = "white", resizable = True):
-        """Will shrink wrap the window around the widgets if width
-        and height are not provided."""
-        Tkinter.Frame.__init__(self, borderwidth = 4, relief = "sunken")
-        if width and height:
-            self.setSize(width, height)
-        self.master.title(title)
-        self.grid()
-        # Expand the frame within the window
-        self.master.rowconfigure(0, weight = 1)
-        self.master.columnconfigure(0, weight = 1)
-        self.grid(sticky = N+S+E+W)
-        # Set the background color and resizability
-        self.setBackground(background)
-        self.setResizable(resizable)
-
-    def setBackground(self, color):
-        """Resets the window's background color to color."""
-        self["background"] = color
-
-    def setResizable(self, state):
-        """Resets the window's resizable property to True
-        or False."""
-        self.master.resizable(state, state)
-
-    def setSize(self, width, height):
-        """Resets the window's width and height in pixels."""
-        self.master.geometry(str(width)+ "x" + str(height))
-
-    def setTitle(self, title):
+from breezypythongui import EasyFrame
 
 
-def __init__(self, title = "", width = None, height = None,
-             background = "white", resizable = True):
-    """Will shrink wrap the window around the widgets if width
-    and height are not provided."""
-    Tkinter.Frame.__init__(self, borderwidth = 4, relief = "sunken")
-    if width and height:
-        self.setSize(width, height)
-    self.master.title(title)
-    self.grid()
-    # Expand the frame within the window
-    self.master.rowconfigure(0, weight = 1)
-    self.master.columnconfigure(0, weight = 1)
-    self.grid(sticky = N+S+E+W)
-    # Set the background color and resizability
-    self.setBackground(background)
-    self.setResizable(resizable)
+class TaxCalculator(EasyFrame):
+    """Application window for the tax calculator."""
 
-def setBackground(self, color):
-    """Resets the window's background color to color."""
-    self["background"] = color
+    def __init__(self):
+        """Sets up the window and the widgets."""
+        EasyFrame.__init__(self, title="Miso Tax Calculator")
 
-def setResizable(self, state):
-    """Resets the window's resizable property to True
-    or False."""
-    self.master.resizable(state, state)
+        # Label and field for the income
+        # (self.incomeField)
+        self.addLabel(text="Gross income", row=0, column=0)
+        self.incomeField = self.addFloatField(value=0.0, row=0, column=1)
 
-def setSize(self, width, height):
-    """Resets the window's width and height in pixels."""
-    self.master.geometry(str(width)+ "x" + str(height))
+        # Label and field for the number of dependents
+        # (self.depField)
+        self.addLabel(text="Dependents", row=1, column=0)
+        self.depField = self.addIntegerField(value=0, row=1, column=1)
 
-def setTitle(self, title):
-    """Resets the window's title to title."""
-    self.master.title(title)
+        # The command button
+        self.addButton(text="Compute", row=2, column=1, columnspan=2, command=self.computeTax)
 
-# Methods to add widgets to the window.  The row and column in
-# the grid are required arguments.
+        # Label and field for the tax
+        # (self.taxField)
+        self.addLabel(text="Total tax", row=3, column=0)
+        self.taxField = self.addFloatField(value=0.0, row=3, column=1, precision=2)
 
-def addLabel(self, text, row, column,
-             columnspan = 1, rowspan = 1,
-             sticky = N+W, font = None,
-             background = "white", foreground = "black"):
-    """Creates and inserts a label at the row and column,
-    and returns the label."""
-    label = Tkinter.Label(self, text = text, font = font,
-                          background = background,
-                          foreground = foreground)
-    self.rowconfigure(row, weight = 1)
-    self.columnconfigure(column, weight = 1)
-    label.grid(row = row, column = column,
-               columnspan = columnspan, rowspan = rowspan,
-               padx = 5, pady = 5, sticky = sticky)
-    return label
+    # The event handler method for the button
+    def computeTax(self):
+        """Obtains the data from the input field and uses
+        them to compute the tax, which is sent to the
+        output field."""
+        income = self.incomeField.getNumber()
+        numDependents = self.depField.getNumber()
+        exemptionAmount = 3000
+        standardDeduction = 10000
+        tax = (income - standardDeduction - numDependents * exemptionAmount) * 0.20
+        self.taxField.setNumber(tax)
+        pass
 
-def addButton(self, text, row, column,
-              columnspan = 1, rowspan = 1,
-              command = lambda: None,
-              state = NORMAL):
-    """Creates and inserts a button at the row and column,
-    and returns the button."""
-    button = Tkinter.Button(self, text = text,
-                            command = command, state = state)
-    self.rowconfigure(row, weight = 1)
-    self.columnconfigure(column, weight = 1)
-    button.grid(row = row, column = column,
-                columnspan = columnspan, rowspan = rowspan,
-                padx = 5, pady = 5)
-    return button
 
-def addFloa
+def main():
+    TaxCalculator().mainloop()
+
+
+if __name__ == "__main__":
+    main()
+
