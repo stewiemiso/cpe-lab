@@ -1,0 +1,37 @@
+import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox
+
+def calculate_average():
+    try:
+        name = name_entry.get()
+        grade1 = float(grade1_entry.get())
+        grade2 = float(grade2_entry.get())
+        grade3 = float(grade3_entry.get())
+        grade4 = float(grade4_entry.get())
+        grade5 = float(grade5_entry.get())
+
+        if 0.00 <= grade1 <= 100.00 and 0.00 <= grade2 <= 100.00 and 0.00 <= grade3 <= 100.00 and 0.00 <= grade4 <= 100.00 and 0.00 <= grade5 <= 100.00:
+            average = (grade1 + grade2 + grade3 + grade4 + grade5) / 5
+            result_label.config(text=f"Average grade for {name}: {average:.2f}")
+            if average >= 70.00:
+                result_label.config(text=f"Average grade for {name}: {average:.2f} - Passed")
+            else:
+                result_label.config(text=f"Average grade for {name}: {average:.2f} - Failed")
+        else:
+            messagebox.showerror("Error", "Invalid grade input. Grades must be between 0.00 and 100.00")
+    except ValueError:
+        messagebox.showerror("Error", "Invalid grade input. Please enter numerical values only.")
+
+# Create the main window
+window = tk.Tk()
+window.title("Student Grade Calculator")
+
+# Create labels and entry fields
+name_label = tk.Label(window, text="Student Name:")
+name_label.grid(row=0, column=0, padx=5, pady=5)
+name_entry = tk.Entry(window)
+name_entry.grid(row=0, column=1, padx=5, pady=5)
+
+grade1_label = tk.Label(window, text="Grade 1:")
+grade1_label.grid
